@@ -1,0 +1,8 @@
+pipeline:
+  build_stage:
+    image: plugins/docker
+    repo: iggalleguillo/sonar-plugin
+    dockerfile: Dockerfile 
+    secrets: [ docker_username, docker_password ]
+    tags:
+      - v-${DRONE_BUILD_NUMBER}
