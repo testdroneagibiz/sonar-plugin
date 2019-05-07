@@ -5,4 +5,5 @@ pipeline:
     dockerfile: Dockerfile 
     secrets: [ docker_username, docker_password ]
     tags:
+      - latest
       - v-${DRONE_BUILD_NUMBER}
