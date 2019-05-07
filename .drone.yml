@@ -2,7 +2,7 @@ pipeline:
   build_stage:
     image: plugins/docker
     repo: iggalleguillo/sonar-plugin
-    dockerfile: Dockerfile 
+    dockerfile: Dockerfile
     secrets: [ docker_username, docker_password ]
     tags:
       - latest
