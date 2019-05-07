@@ -48,6 +48,7 @@ RUN wget https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/
 ENV PATH="${SONAR_SCANNER_MSBUILD_HOME}:${SONAR_SCANNER_MSBUILD_HOME}/sonar-scanner-${SONAR_SCANNER_VERSION}/bin:${PATH}"
 COPY drone-sonar /bin/
 WORKDIR /bin
+RUN chmod 775 drone-sonar
 
 RUN curl https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/${SONAR_SCANNER_CLI}.zip -so /bin/${SONAR_SCANNER_CLI}.zip
 RUN unzip ${SONAR_SCANNER_CLI}.zip \
