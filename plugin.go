@@ -52,5 +52,21 @@ func (p Plugin) Exec() error {
 		return err
 	}
 
+	args2 := []string{
+		"/k:" + strings.Replace(p.Config.Key, "/", ":", -1),
+		"/d:sonar.verbose=true",
+		"/d:sonar.host.url=" + p.Config.Host,
+		"/d:sonar.login=" + p.Config.Token,
+	}
+	exec.Command("SonarScanner.MSBuild.exe begin", args2...)
+	output, err = cmd.CombinedOutput()
+	fmt.Printf(string(output))
+	exec.Command("MSBuild.exe /t:Rebuild /v:diag")
+	output, err = cmd.CombinedOutput()
+	fmt.Printf(string(output))
+	exec.Command("SonarScanner.MSBuild.exe end")
+	output, err = cmd.CombinedOutput()
+	fmt.Printf(string(output))
+
 	return nil
 }
