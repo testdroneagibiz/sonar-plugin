@@ -43,12 +43,6 @@ func (p Plugin) Exec() error {
 		"-Dsonar.scm.provider=git",
 		
 	}
-	args2 := []string{
-		"/k:" + strings.Replace(p.Config.Key, "/", ":", -1),
-		"/d:sonar.verbose=true",
-		"/d:sonar.host.url=" + p.Config.Host,
-		"/d:sonar.login=" + p.Config.Token,
-	}
 	cmd := exec.Command("sonar-scanner", args...)
 	output, err := cmd.CombinedOutput()
 	if len(output) > 0 {
@@ -57,16 +51,6 @@ func (p Plugin) Exec() error {
 	if err != nil {
 		return err
 	}
-
-	exec.Command("SonarScanner.MSBuild.exe begin", args2...)
-	output, err = cmd.CombinedOutput()
-	fmt.Printf(string(output))
-	exec.Command("MSBuild.exe /t:Rebuild /v:diag")
-	output, err = cmd.CombinedOutput()
-	fmt.Printf(string(output))
-	exec.Command("SonarScanner.MSBuild.exe end")
-	output, err = cmd.CombinedOutput()
-	fmt.Printf(string(output))
 
 	return nil
 }
