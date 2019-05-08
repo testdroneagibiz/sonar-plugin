@@ -27,46 +27,44 @@ type (
 )
 
 func (p Plugin) Exec() error {
-	args := []string{
-		"-Dsonar.projectKey=" + strings.Replace(p.Config.Key, "/", ":", -1),
-		"-Dsonar.projectName=" + p.Config.Name,
-		"-Dsonar.host.url=" + p.Config.Host,
-		"-Dsonar.login=" + p.Config.Token,
-
-		"-Dsonar.projectVersion=" + p.Config.Version,
-		"-Dsonar.sources=" + p.Config.Sources,
-		"-Dsonar.ws.timeout=" + p.Config.Timeout,
-		"-Dsonar.inclusions=" + p.Config.Inclusions,
-		"-Dsonar.exclusions=" + p.Config.Exclusions,
-		"-Dsonar.log.level=" + p.Config.Level,
-		"-Dsonar.showProfiling=" + p.Config.showProfiling,
-		"-Dsonar.scm.provider=git",
-		
-	}
-	cmd := exec.Command("sonar-scanner", args...)
-	output, err := cmd.CombinedOutput()
-	if len(output) > 0 {
-		fmt.Printf("==> Code Analysis Result: %s\n", string(output))
-	}
-	if err != nil {
-		return err
-	}
-
 	args2 := []string{
 		"/k:" + strings.Replace(p.Config.Key, "/", ":", -1),
 		"/d:sonar.verbose=true",
 		"/d:sonar.host.url=" + p.Config.Host,
 		"/d:sonar.login=" + p.Config.Token,
 	}
-	exec.Command("SonarScanner.MSBuild.exe begin", args2...)
-	output, err = cmd.CombinedOutput()
-	fmt.Printf(string(output))
+	 
+	cmd := exec.Command("SonarScanner.MSBuild.exe begin", args2...)
+	
 	exec.Command("MSBuild.exe /t:Rebuild /v:diag")
-	output, err = cmd.CombinedOutput()
-	fmt.Printf(string(output))
+	
 	exec.Command("SonarScanner.MSBuild.exe end")
-	output, err = cmd.CombinedOutput()
+	output, err := cmd.CombinedOutput()
 	fmt.Printf(string(output))
 
+	// args := []string{
+	// 	"-Dsonar.projectKey=" + strings.Replace(p.Config.Key, "/", ":", -1),
+	// 	"-Dsonar.projectName=" + p.Config.Name,
+	// 	"-Dsonar.host.url=" + p.Config.Host,
+	// 	"-Dsonar.login=" + p.Config.Token,
+
+	// 	"-Dsonar.projectVersion=" + p.Config.Version,
+	// 	"-Dsonar.sources=" + p.Config.Sources,
+	// 	"-Dsonar.ws.timeout=" + p.Config.Timeout,
+	// 	"-Dsonar.inclusions=" + p.Config.Inclusions,
+	// 	"-Dsonar.exclusions=" + p.Config.Exclusions,
+	// 	"-Dsonar.log.level=" + p.Config.Level,
+	// 	"-Dsonar.showProfiling=" + p.Config.showProfiling,
+	// 	"-Dsonar.scm.provider=git",
+		
+	// }
+	// cmd := exec.Command("sonar-scanner", args...)
+	// output, err := cmd.CombinedOutput()
+	// if len(output) > 0 {
+	// 	fmt.Printf("==> Code Analysis Result: %s\n", string(output))
+	// }
+	if err != nil {
+		return err
+	}
 	return nil
 }
