@@ -1,55 +1,42 @@
-FROM openjdk:8u212-jre-stretch
+FROM microsoft/dotnet:2.2.103-sdk
 
 ARG SONAR_VERSION=3.3.0.1492
-ARG SONAR_SCANNER_MSBUILD_VERSION=4.3.1.1372
 ARG SONAR_SCANNER_CLI=sonar-scanner-cli-${SONAR_VERSION}
 ARG SONAR_SCANNER=sonar-scanner-${SONAR_VERSION}
-ARG DOTNET_SDK_VERSION=2.1
-ARG MONO_DEBIAN_VERSION=5.12.0.226-0xamarin3+debian9b1
-ARG DOTNET_PROJECT_DIR=/project
-ARG DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
-ARG DOTNET_CLI_TELEMETRY_OPTOUT=true
-ARG SONAR_SCANNER_MSBUILD_HOME=/opt/sonar-scanner-msbuild
+ENV SONAR_SCANNER_MSBUILD_VERSION 4.6.0.1930
+# reviewing this choice
+ENV DOCKER_VERSION 18.06.1~ce~3-0~debian
+# Install Java 8
+RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y openjdk-8-jre
 
-RUN set -x \
-  && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF \
-  && echo "deb http://download.mono-project.com/repo/debian stable-stretch main" | tee /etc/apt/sources.list.d/mono-official-stable.list \
-  && apt-get update \
-  && apt-get install \
-    curl \
-    libunwind8 \
-    gettext \
-    apt-transport-https \
-    mono-complete \
-    ca-certificates-mono \
-    referenceassemblies-pcl \
-    mono-xsp4 \
-    wget \
-    unzip \
-    nodejs \
-    -y \
-  && curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg \
-  && mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg \
-  && sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/debian/9/prod stretch main" > /etc/apt/sources.list.d/microsoft-prod.list' \
-  && apt-get update \
-  && apt-get install dotnet-sdk-${DOTNET_SDK_VERSION} -y \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/*
+# Install docker binaries
+RUN apt-get install -y \
+        apt-transport-https \
+        ca-certificates \
+        curl \
+        gnupg2 \
+        software-properties-common \
+    && curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - \
+    && apt-key fingerprint 0EBFCD88 \
+    && add-apt-repository \
+        "deb [arch=amd64] https://download.docker.com/linux/debian \
+        $(lsb_release -cs) \
+        stable" \
+    && apt-get update \
+    && apt-get install -y docker-ce=$DOCKER_VERSION
 
-RUN wget https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/$SONAR_SCANNER_MSBUILD_VERSION/sonar-scanner-msbuild-$SONAR_SCANNER_MSBUILD_VERSION-net46.zip -O /opt/sonar-scanner-msbuild.zip \
-  && mkdir -p ${SONAR_SCANNER_MSBUILD_HOME} \
-  && mkdir -p ${DOTNET_PROJECT_DIR} \
-  && unzip /opt/sonar-scanner-msbuild.zip -d ${SONAR_SCANNER_MSBUILD_HOME} \
-  && rm /opt/sonar-scanner-msbuild.zip \
-  && chmod 775 ${SONAR_SCANNER_MSBUILD_HOME}/*.exe \
-  && chmod 775 ${SONAR_SCANNER_MSBUILD_HOME}/**/bin/* \
-  && chmod 775 ${SONAR_SCANNER_MSBUILD_HOME}/**/lib/*.jar
+# install nodejs
+RUN curl -sL https://deb.nodesource.com/setup_11.x | bash - && apt-get install -y nodejs autoconf libtool nasm
 
-ENV PATH="${SONAR_SCANNER_MSBUILD_HOME}:${SONAR_SCANNER_MSBUILD_HOME}/sonar-scanner-${SONAR_SCANNER_VERSION}/bin:${PATH}"
+# Install Sonar Scanner
+RUN apt-get install -y unzip \
+    && wget https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/$SONAR_SCANNER_MSBUILD_VERSION/sonar-scanner-msbuild-$SONAR_SCANNER_MSBUILD_VERSION-netcoreapp2.0.zip \
+    && unzip sonar-scanner-msbuild-$SONAR_SCANNER_MSBUILD_VERSION-netcoreapp2.0.zip -d /sonar-scanner \
+    && rm sonar-scanner-msbuild-$SONAR_SCANNER_MSBUILD_VERSION-netcoreapp2.0.zip \
+    && chmod +x -R /sonar-scanner
 
 COPY drone-sonar /bin/
 WORKDIR /bin
-
 RUN curl https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/${SONAR_SCANNER_CLI}.zip -so /bin/${SONAR_SCANNER_CLI}.zip
 RUN unzip ${SONAR_SCANNER_CLI}.zip \
     && rm ${SONAR_SCANNER_CLI}.zip \
@@ -57,7 +44,9 @@ RUN unzip ${SONAR_SCANNER_CLI}.zip \
 
 ENV PATH $PATH:/bin/${SONAR_SCANNER}/bin
 
-RUN chmod 777 /bin/${SONAR_SCANNER}/bin/sonar-scanner
-RUN chmod 777 /bin/drone-sonar
+# Cleanup
+RUN apt-get -q autoremove \
+    && apt-get -q clean -y \
+    && rm -rf /var/lib/apt/lists/* /var/cache/apt/*.bin
 
 ENTRYPOINT /bin/drone-sonar
