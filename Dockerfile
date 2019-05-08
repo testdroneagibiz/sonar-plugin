@@ -55,9 +55,8 @@ RUN unzip ${SONAR_SCANNER_CLI}.zip \
     && rm ${SONAR_SCANNER_CLI}.zip \
     && apt-get purge --auto-remove curl -y
 
-ENV PATH=$PATH:/bin/${SONAR_SCANNER}/bin
+ENV PATH $PATH:/bin/${SONAR_SCANNER}/bin
 
 RUN chmod +x /bin/drone-sonar
-RUN chmod +x drone-sonar
 
 ENTRYPOINT /bin/drone-sonar
