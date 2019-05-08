@@ -49,5 +49,6 @@ RUN apt-get -q autoremove \
     && apt-get -q clean -y \
     && rm -rf /var/lib/apt/lists/* /var/cache/apt/*.bin
 
+RUN chmod u+x /bin/drone-sonar 
  
 ENTRYPOINT /bin/drone-sonar
