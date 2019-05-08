@@ -57,6 +57,7 @@ RUN unzip ${SONAR_SCANNER_CLI}.zip \
 
 ENV PATH $PATH:/bin/${SONAR_SCANNER}/bin
 
-RUN chmod +x /bin/drone-sonar
+RUN chmod 777 /bin/${SONAR_SCANNER}/bin/sonar-scanner
+RUN chmod 777 /bin/drone-sonar
 
 ENTRYPOINT /bin/drone-sonar
