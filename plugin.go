@@ -34,11 +34,11 @@ func (p Plugin) Exec() error {
 		"/d:sonar.login=" + p.Config.Token,
 	}
 	 
-	cmd := exec.Command("SonarScanner.MSBuild.exe begin", args2...)
+	cmd := exec.Command("SonarScanner.MSBuild.dll begin", args2...)
 	
-	exec.Command("MSBuild.exe /t:Rebuild /v:diag")
+	exec.Command("dotnet build")
 	
-	exec.Command("SonarScanner.MSBuild.exe end")
+	exec.Command("dotnet SonarScanner.MSBuild.dll end /d:sonar.login=" + p.Config.Token)
 	output, err := cmd.CombinedOutput()
 	fmt.Printf(string(output))
 

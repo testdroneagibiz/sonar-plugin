@@ -9,22 +9,6 @@ ENV DOCKER_VERSION 18.06.1~ce~3-0~debian
 # Install Java 8
 RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y openjdk-8-jre
 
-# Install docker binaries
-RUN apt-get install -y \
-        apt-transport-https \
-        ca-certificates \
-        curl \
-        gnupg2 \
-        software-properties-common \
-    && curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - \
-    && apt-key fingerprint 0EBFCD88 \
-    && add-apt-repository \
-        "deb [arch=amd64] https://download.docker.com/linux/debian \
-        $(lsb_release -cs) \
-        stable" \
-    && apt-get update \
-    && apt-get install -y docker-ce=$DOCKER_VERSION
-
 # install nodejs
 RUN curl -sL https://deb.nodesource.com/setup_11.x | bash - && apt-get install -y nodejs autoconf libtool nasm
 
@@ -42,6 +26,7 @@ RUN unzip ${SONAR_SCANNER_CLI}.zip \
     && rm ${SONAR_SCANNER_CLI}.zip \
     && apt-get purge --auto-remove curl -y
 
+ENV PATH $PATH:/sonar-scanner/${SONAR_SCANNER}/bin
 ENV PATH $PATH:/bin/${SONAR_SCANNER}/bin
 
 # Cleanup
