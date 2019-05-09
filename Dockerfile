@@ -51,4 +51,4 @@ RUN apt-get -q autoremove \
 
 RUN chmod u+x /bin/drone-sonar 
  
-ENTRYPOINT ["/bin/bash", "/bin/drone-sonar"]
+ENTRYPOINT /bin/drone-sonar
