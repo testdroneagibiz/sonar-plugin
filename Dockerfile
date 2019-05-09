@@ -27,6 +27,7 @@ RUN unzip ${SONAR_SCANNER_CLI}.zip \
     && apt-get purge --auto-remove curl -y
 
 ENV PATH $PATH:/sonar-scanner/${SONAR_SCANNER}/bin
+RUN ls -la
 ENV PATH $PATH:/bin/${SONAR_SCANNER}/bin
 
 # Cleanup
