@@ -40,8 +40,10 @@ func (p Plugin) Exec() error {
 		"end",
 		"/d:sonar.login=" + p.Config.Token,
 	}
+
+	
 	startProcess := exec.Command("dotnet", args2...)
-	dotNetBuild := exec.Command("dotnet build")
+	dotNetBuild := exec.Command("dotnet", "build")
 	endProcess := exec.Command("dotnet", args3...)
 	outputStartProcess, errStartProcess := startProcess.CombinedOutput()
 	outputDotNetBuild, errDotNetBuild := dotNetBuild.CombinedOutput()
