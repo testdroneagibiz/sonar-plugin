@@ -28,17 +28,21 @@ type (
 
 func (p Plugin) Exec() error {
 	args2 := []string{
-		"/k:" + strings.Replace(p.Config.Key, "/", ":", -1),
-		"/d:sonar.verbose=true",
-		"/d:sonar.host.url=" + p.Config.Host,
+		"/sonar-scanner/SonarScanner.MSBuild.dll",
+		"begin",
+		 "/k:" + strings.Replace(p.Config.Key, "/", ":", -1),
+		 "/d:sonar.host.url=" + p.Config.Host,
+		 "/d:sonar.login=" + p.Config.Token,
+		 //"/d:sonar.sources=" + p.Config.Sources,
+	}
+	args3 :=[]string{
+		"/sonar-scanner/SonarScanner.MSBuild.exe",
+		"end",
 		"/d:sonar.login=" + p.Config.Token,
 	}
-	 
-	cmd := exec.Command("dotnet /sonar-scanner/SonarScanner.MSBuild.dll begin", args2...)
-	
+	cmd := exec.Command("dotnet", args2...)
 	exec.Command("dotnet build")
-	
-	exec.Command("dotnet /sonar-scanner/SonarScanner.MSBuild.dll end /d:sonar.login=" + p.Config.Token)
+	exec.Command("dotnet", args3...)
 	output, err := cmd.CombinedOutput()
 	fmt.Printf(string(output))
 

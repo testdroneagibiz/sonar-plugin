@@ -3,7 +3,8 @@ FROM microsoft/dotnet:2.2.103-sdk
 ARG SONAR_VERSION=3.3.0.1492
 ARG SONAR_SCANNER_CLI=sonar-scanner-cli-${SONAR_VERSION}
 ARG SONAR_SCANNER=sonar-scanner-${SONAR_VERSION}
-ENV SONAR_SCANNER_MSBUILD_VERSION 4.6.0.1930
+
+ENV SONAR_SCANNER_MSBUILD_VERSION 4.5.0.1761
 # reviewing this choice
 ENV DOCKER_VERSION 18.06.1~ce~3-0~debian
 # Install Java 8
@@ -19,22 +20,20 @@ RUN apt-get install -y unzip \
     && rm sonar-scanner-msbuild-$SONAR_SCANNER_MSBUILD_VERSION-netcoreapp2.0.zip \
     && chmod +x -R /sonar-scanner
 
+# Cleanup
+RUN apt-get -q autoremove \
+    && apt-get -q clean -y \
+    && rm -rf /var/lib/apt/lists/* /var/cache/apt/*.bin
+
 COPY drone-sonar /bin/
+
 WORKDIR /bin
 RUN curl https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/${SONAR_SCANNER_CLI}.zip -so /bin/${SONAR_SCANNER_CLI}.zip
 RUN unzip ${SONAR_SCANNER_CLI}.zip \
     && rm ${SONAR_SCANNER_CLI}.zip \
     && apt-get purge --auto-remove curl -y
 
-#ENV PATH "$PATH:/sonar-scanner"
 ENV PATH=$PATH:/bin/${SONAR_SCANNER}/bin
-
-# Cleanup
-RUN apt-get -q autoremove \
-    && apt-get -q clean -y \
-    && rm -rf /var/lib/apt/lists/* /var/cache/apt/*.bin
-
-
 RUN chmod u+x /bin/drone-sonar 
 
 ENTRYPOINT /bin/drone-sonar
