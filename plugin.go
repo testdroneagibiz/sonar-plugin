@@ -36,15 +36,32 @@ func (p Plugin) Exec() error {
 		 //"/d:sonar.sources=" + p.Config.Sources,
 	}
 	args3 :=[]string{
-		"/sonar-scanner/SonarScanner.MSBuild.exe",
+		"/sonar-scanner/SonarScanner.MSBuild.dll",
 		"end",
 		"/d:sonar.login=" + p.Config.Token,
 	}
-	cmd := exec.Command("dotnet", args2...)
-	exec.Command("dotnet build")
-	exec.Command("dotnet", args3...)
-	output, err := cmd.CombinedOutput()
-	fmt.Printf(string(output))
+	startProcess := exec.Command("dotnet", args2...)
+	dotNetBuild := exec.Command("dotnet build")
+	endProcess := exec.Command("dotnet", args3...)
+	outputStartProcess, errStartProcess := startProcess.CombinedOutput()
+	outputDotNetBuild, errDotNetBuild := dotNetBuild.CombinedOutput()
+	outputEndProcess, errEndProcess := endProcess.CombinedOutput()
+	fmt.Printf(string(outputStartProcess))
+	fmt.Printf(string(outputDotNetBuild))
+	fmt.Printf(string(outputEndProcess))
+
+	if errStartProcess != nil {
+		return errStartProcess
+	}
+
+	if errDotNetBuild != nil {
+		return errDotNetBuild
+	}
+
+	if errEndProcess != nil {
+		return errEndProcess
+	}
+
 
 	// args := []string{
 	// 	"-Dsonar.projectKey=" + strings.Replace(p.Config.Key, "/", ":", -1),
@@ -67,8 +84,8 @@ func (p Plugin) Exec() error {
 	// if len(output) > 0 {
 	// 	fmt.Printf("==> Code Analysis Result: %s\n", string(output))
 	// }
-	if err != nil {
-		return err
-	}
+	// if err != nil {
+	// 	return err
+	// }
 	return nil
 }
