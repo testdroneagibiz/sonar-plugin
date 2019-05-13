@@ -11,7 +11,7 @@ ENV DOCKER_VERSION 18.06.1~ce~3-0~debian
 RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y openjdk-8-jre
 
 # install nodejs
-RUN curl -sL https://deb.nodesource.com/setup_11.x | bash - && apt-get install -y nodejs autoconf libtool nasm
+#RUN curl -sL https://deb.nodesource.com/setup_11.x | bash - && apt-get install -y nodejs autoconf libtool nasm
 
 # Install Sonar Scanner
 RUN apt-get install -y unzip \
