@@ -28,12 +28,12 @@ RUN apt-get -q autoremove \
 COPY drone-sonar /bin/
 
 WORKDIR /bin
-RUN curl https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/${SONAR_SCANNER_CLI}.zip -so /bin/${SONAR_SCANNER_CLI}.zip
-RUN unzip ${SONAR_SCANNER_CLI}.zip \
-    && rm ${SONAR_SCANNER_CLI}.zip \
-    && apt-get purge --auto-remove curl -y
+#RUN curl https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/${SONAR_SCANNER_CLI}.zip -so /bin/${SONAR_SCANNER_CLI}.zip
+#RUN unzip ${SONAR_SCANNER_CLI}.zip \
+    #&& rm ${SONAR_SCANNER_CLI}.zip \
+    #&& apt-get purge --auto-remove curl -y
 
-ENV PATH=$PATH:/bin/${SONAR_SCANNER}/bin
+#ENV PATH=$PATH:/bin/${SONAR_SCANNER}/bin
 RUN chmod u+x /bin/drone-sonar 
 
 ENTRYPOINT /bin/drone-sonar
