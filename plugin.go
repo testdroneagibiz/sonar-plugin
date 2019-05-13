@@ -31,9 +31,9 @@ func (p Plugin) Exec() error {
 		"/sonar-scanner/SonarScanner.MSBuild.dll",
 		"begin",
 		 "/k:" + strings.Replace(p.Config.Key, "/", ":", -1),
+		 "/v:" + p.Config.Version,
 		 "/d:sonar.host.url=" + p.Config.Host,
 		 "/d:sonar.login=" + p.Config.Token,
-		 "/v:" + p.Config.Version,
 	}
 	args2 :=[]string{
 		"/sonar-scanner/SonarScanner.MSBuild.dll",
